@@ -1,0 +1,15 @@
+[package]
+name = "dataset_support_rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ndarray = "0.15.6"
+pyo3 =  { version = "0.20.2", features = ["extension-module"] }
+numpy = "0.20.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.maturin]
+name = "dataset_support"
