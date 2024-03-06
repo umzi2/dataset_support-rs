@@ -1,4 +1,4 @@
-use ndarray::{Array1, ArrayD};
+use ndarray::{Array1, ArrayD, s};
 use numpy::{ PyArrayDyn,  PyReadonlyArrayDyn, ToPyArray};
 use pyo3::prelude::*;
 
@@ -114,10 +114,26 @@ fn color_levels(
     // Возвращаем результат в виде PyArrayDyn<f32>
     Ok(result_array.to_pyarray(py).to_owned())
 }
+#[pyfunction]
+fn gray_or_color(
+    input: PyReadonlyArrayDyn<f32>,
+    min: f32,
+)->PyResult<bool>{
+    let array = input.as_array();
+    let binding = &array.slice(s![.., .., 0]) - &array.slice(s![.., .., 1]);
+    let rg_mean = binding.view();
+    let binding = &array.slice(s![.., .., 1]) - &array.slice(s![.., .., 2]);
+    let gb_mean = binding.view();
 
+    let rg_mean_value = rg_mean.mean().unwrap();
+    let gb_mean_value = gb_mean.mean().unwrap();
+    let result = rg_mean_value+gb_mean_value<min;
+    Ok(result)
+}
 #[pymodule]
 fn dataset_support(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(sin_patern, m)?)?;
     m.add_function(wrap_pyfunction!(color_levels,m)?)?;
+    m.add_function(wrap_pyfunction!(gray_or_color,m)?)?;
     Ok(())
 }
