@@ -120,14 +120,20 @@ fn gray_or_color(
     min: f32,
 )->PyResult<bool>{
     let array = input.as_array();
-    let binding = &array.slice(s![.., .., 0]) - &array.slice(s![.., .., 1]);
-    let rg_mean = binding.view();
-    let binding = &array.slice(s![.., .., 1]) - &array.slice(s![.., .., 2]);
-    let gb_mean = binding.view();
+    let binding = &array.slice(s![.., .., 0]) ;
+    let r_mean = binding.view();
+    let binding = &array.slice(s![.., .., 1]);
+    let g_mean = binding.view();
+    let binding = &array.slice(s![.., .., 2]);
+    let b_mean = binding.view();
 
-    let rg_mean_value = rg_mean.mean().unwrap();
-    let gb_mean_value = gb_mean.mean().unwrap();
-    let result = rg_mean_value+gb_mean_value<min;
+    let r_mean_value = r_mean.mean().unwrap();
+    let g_mean_value = g_mean.mean().unwrap();
+    let b_mean_value = b_mean.mean().unwrap();
+    let r_target =  g_mean_value+min >= r_mean_value && r_mean_value >= g_mean_value-min && b_mean_value+min >= r_mean_value && r_mean_value >= b_mean_value-min;
+    let g_target =  r_mean_value+min >= g_mean_value && g_mean_value >= r_mean_value-min && b_mean_value+min >= g_mean_value && g_mean_value >= b_mean_value-min;
+    let b_target =  g_mean_value+min >= b_mean_value && b_mean_value >= g_mean_value-min && r_mean_value+min >= b_mean_value && b_mean_value >= r_mean_value-min;
+    let result = g_target&&r_target&&b_target;
     Ok(result)
 }
 #[pymodule]
